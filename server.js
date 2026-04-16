@@ -50,6 +50,8 @@ const ALLOWED_ORIGINS = [
   process.env.ADMIN_URL     || 'http://localhost:3002',
   'http://localhost:3000',
   'http://localhost:4173',   // vite preview
+  'https://teraby-client.vercel.app',
+  'https://teraby-admin.vercel.app',
 ]
 
 app.use(cors({
