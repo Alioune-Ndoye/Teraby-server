@@ -105,6 +105,11 @@ app.use('/api/agents',     agentRoutes)
 app.use('/api/gallery',    galleryRoutes)
 app.use('/api/team',       teamRoutes)
 
+// ─── Root ─────────────────────────────────────────────────────────────────────
+app.get('/', (_req, res) => {
+  res.json({ success: true, message: 'Teraby API is running', version: '1.0.0' })
+})
+
 // ─── Error handling ───────────────────────────────────────────────────────────
 app.use(notFound)
 app.use(errorHandler)
