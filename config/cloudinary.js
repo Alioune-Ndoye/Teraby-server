@@ -1,5 +1,4 @@
 import { v2 as cloudinary } from 'cloudinary'
-import { CloudinaryStorage } from 'multer-storage-cloudinary'
 import multer from 'multer'
 
 cloudinary.config({
@@ -8,24 +7,34 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 })
 
+// ─── Custom multer storage engine for Cloudinary v2 ──────────────────────────
+function makeCloudinaryStorage(uploadParams) {
+  return {
+    _handleFile(_req, file, cb) {
+      const uploadStream = cloudinary.uploader.upload_stream(uploadParams, (error, result) => {
+        if (error) return cb(error)
+        cb(null, { path: result.secure_url, filename: result.public_id, cloudinary: result })
+      })
+      file.stream.pipe(uploadStream)
+    },
+    _removeFile(_req, file, cb) {
+      cloudinary.uploader.destroy(file.filename, cb)
+    },
+  }
+}
+
 // ─── Gallery storage (before / after images) ──────────────────────────────────
-const galleryStorage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: 'teraby/gallery',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [{ width: 1200, crop: 'limit', quality: 'auto' }],
-  },
+const galleryStorage = makeCloudinaryStorage({
+  folder: 'teraby/gallery',
+  allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+  transformation: [{ width: 1200, crop: 'limit', quality: 'auto' }],
 })
 
 // ─── Team member photo storage ────────────────────────────────────────────────
-const teamStorage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: 'teraby/team',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [{ width: 600, height: 750, crop: 'fill', gravity: 'face', quality: 'auto' }],
-  },
+const teamStorage = makeCloudinaryStorage({
+  folder: 'teraby/team',
+  allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+  transformation: [{ width: 600, height: 750, crop: 'fill', gravity: 'face', quality: 'auto' }],
 })
 
 const fileFilter = (_req, file, cb) => {
