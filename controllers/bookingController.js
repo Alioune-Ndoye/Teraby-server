@@ -22,7 +22,7 @@ export const createBooking = async (req, res) => {
 
   const booking = await Booking.create({
     ...req.body,
-    estimatedPrice: PRICE_MAP[serviceType] ?? null,
+    estimatedPrice: req.body.estimatedPrice ?? PRICE_MAP[serviceType] ?? null,
   })
 
   // Fire-and-forget WhatsApp notification — mark notificationSent on success
