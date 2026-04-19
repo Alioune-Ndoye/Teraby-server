@@ -26,8 +26,8 @@ const bookingSchema = new Schema(
       type: String,
       required: [true, 'Service type is required'],
       enum: {
-        values: ['residential', 'deep', 'move', 'commercial'],
-        message: 'Service type must be: residential, deep, move, or commercial',
+        values: ['standard_express', 'standard_standard', 'standard_premium', 'premium_signature', 'premium_excellence'],
+        message: 'Invalid service type',
       },
     },
     frequency: {

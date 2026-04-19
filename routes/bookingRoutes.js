@@ -20,7 +20,10 @@ const bookingBody = [
   body('name').trim().notEmpty().withMessage('Name is required'),
   body('email').isEmail().withMessage('Valid email required'),
   body('phone').trim().notEmpty().withMessage('Phone is required'),
-  body('serviceType').isIn(['residential', 'deep', 'move', 'commercial']).withMessage('Invalid service type'),
+  body('serviceType').isIn([
+    'standard_express', 'standard_standard', 'standard_premium',
+    'premium_signature', 'premium_excellence',
+  ]).withMessage('Invalid service type'),
   body('date').isISO8601().withMessage('Valid date required'),
   body('time').trim().notEmpty().withMessage('Time is required'),
   body('address').trim().notEmpty().withMessage('Address is required'),
