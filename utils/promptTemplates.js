@@ -97,12 +97,11 @@ Si le client souhaite réserver, dirige-le vers le formulaire de réservation en
 
 Ne divulgue jamais d'informations internes, ne mentionne pas d'autres prestataires.`
 
-// ─── Booking confirmation WhatsApp template ───────────────────────────────────
+// ─── Booking notification WhatsApp template (admin) ──────────────────────────
 export const buildBookingNotification = (booking) => {
-  const base = process.env.BASE_URL || `http://localhost:${process.env.PORT || 5000}`
-  const confirmUrl = `${base}/confirm/${booking.confirmToken}`
+  const shortId = booking._id.toString().slice(-6).toUpperCase()
   return `
-🏠 *Nouvelle réservation Teraby*
+🏠 *Nouvelle réservation Teraby* [#${shortId}]
 
 👤 *Client :* ${booking.name}
 📧 *Email :* ${booking.email}
@@ -116,8 +115,9 @@ export const buildBookingNotification = (booking) => {
 
 ${booking.notes ? `📝 *Notes :* ${booking.notes}\n` : ''}💰 *Estimation :* ${booking.estimatedPrice ? `${booking.estimatedPrice}€` : 'À définir'}
 
-👆 *Accepter ou refuser :*
-${confirmUrl}
+Répondez :
+*1* = ✅ Accepter
+*2* = ❌ Refuser
 `.trim()
 }
 
