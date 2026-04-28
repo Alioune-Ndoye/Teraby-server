@@ -13,6 +13,7 @@ import { errorHandler, notFound } from './middleware/errorHandler.js'
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 import bookingRoutes   from './routes/bookingRoutes.js'
+import { confirmPage }  from './controllers/bookingController.js'
 import scheduleRoutes  from './routes/scheduleRoutes.js'
 import whatsappRoutes  from './routes/whatsappRoutes.js'
 import aiRoutes        from './routes/aiRoutes.js'
@@ -106,6 +107,11 @@ app.use('/api/ai',         aiRoutes)
 app.use('/api/agents',     agentRoutes)
 app.use('/api/gallery',    galleryRoutes)
 app.use('/api/team',       teamRoutes)
+
+// ─── Mobile confirm page — opened from WhatsApp link ─────────────────────────
+// Must be outside /api/* to avoid rate limiting and work as a plain page URL
+import asyncHandler from './middleware/asyncHandler.js'
+app.get('/confirm/:token', asyncHandler(confirmPage))
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 app.get('/', (_req, res) => {

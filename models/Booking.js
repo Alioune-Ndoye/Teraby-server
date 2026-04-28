@@ -26,7 +26,7 @@ const bookingSchema = new Schema(
       type: String,
       required: [true, 'Service type is required'],
       enum: {
-        values: ['standard_express', 'standard_standard', 'standard_premium', 'premium_signature', 'premium_excellence'],
+        values: ['standard_express', 'standard_standard', 'standard_premium', 'premium_signature', 'premium_excellence', 'commercial'],
         message: 'Invalid service type',
       },
     },
@@ -58,6 +58,8 @@ const bookingSchema = new Schema(
       enum: ['pending', 'accepted', 'declined', 'completed'],
       default: 'pending',
     },
+    // Token for phone-based accept/deny (included in WhatsApp link)
+    confirmToken: { type: String, unique: true, sparse: true },
     // Internal tracking fields
     notificationSent: { type: Boolean, default: false },
     statusHistory: [

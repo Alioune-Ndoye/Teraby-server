@@ -9,11 +9,12 @@ import {
   updateStatus,
   updateBooking,
   deleteBooking,
+  confirmPage,
+  confirmAction,
 } from '../controllers/bookingController.js'
 
 const router = Router()
 
-// Shared validators
 const bookingId = param('id').isMongoId().withMessage('Invalid booking ID')
 
 const bookingBody = [
@@ -22,7 +23,7 @@ const bookingBody = [
   body('phone').trim().notEmpty().withMessage('Phone is required'),
   body('serviceType').isIn([
     'standard_express', 'standard_standard', 'standard_premium',
-    'premium_signature', 'premium_excellence',
+    'premium_signature', 'premium_excellence', 'commercial',
   ]).withMessage('Invalid service type'),
   body('date').isISO8601().withMessage('Valid date required'),
   body('time').trim().notEmpty().withMessage('Time is required'),
@@ -37,5 +38,8 @@ router.patch(  '/:id/status',    [bookingId,
 ], validate, asyncHandler(updateStatus))
 router.put(    '/:id',           [bookingId], validate, asyncHandler(updateBooking))
 router.delete( '/:id',           [bookingId], validate, asyncHandler(deleteBooking))
+
+// Phone-based accept/deny (called by the confirm HTML page)
+router.post('/confirm/:token', asyncHandler(confirmAction))
 
 export default router
