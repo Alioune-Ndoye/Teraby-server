@@ -1,6 +1,6 @@
 import { sendWhatsApp, parseWebhook, notifyStatusUpdate } from '../services/twilioService.js'
 import { chat } from '../services/anthropicService.js'
-import { sendBookingConfirmation } from '../services/resendService.js'
+import { sendBookingConfirmation, sendBookingRejection } from '../services/resendService.js'
 import { success } from '../utils/responseHelper.js'
 import { broadcast } from '../server.js'
 import Booking from '../models/Booking.js'
@@ -56,7 +56,7 @@ async function handleAdminReply(adminFrom, msg) {
   booking.statusHistory.push({ status: action, changedAt: new Date() })
   await booking.save()
 
-  broadcast('booking_updated', { id: booking._id, status: action })
+  broadcast('booking_updated', { id: booking._id, status: action, source: 'whatsapp' })
 
   notifyStatusUpdate(booking).catch((e) =>
     console.warn('Client WhatsApp notification failed:', e.message)
@@ -66,6 +66,10 @@ async function handleAdminReply(adminFrom, msg) {
     sendBookingConfirmation(booking)
       .then(() => console.log(`📧 Confirmation email sent to ${booking.email}`))
       .catch((e) => console.warn('Confirmation email failed:', e.message))
+  } else {
+    sendBookingRejection(booking)
+      .then(() => console.log(`📧 Rejection email sent to ${booking.email}`))
+      .catch((e) => console.warn('Rejection email failed:', e.message))
   }
 
   const shortId = booking._id.toString().slice(-6).toUpperCase()
