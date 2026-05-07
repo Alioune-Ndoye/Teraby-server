@@ -115,9 +115,9 @@ export const buildBookingNotification = (booking) => {
 
 ${booking.notes ? `📝 *Notes :* ${booking.notes}\n` : ''}💰 *Estimation :* ${booking.estimatedPrice ? `${booking.estimatedPrice}€` : 'À définir'}
 
-Répondez :
-*1* = ✅ Accepter
-*2* = ❌ Refuser
+Répondez avec l'ID :
+*1 ${booking._id}* = ✅ Accepter
+*2 ${booking._id}* = ❌ Refuser
 `.trim()
 }
 

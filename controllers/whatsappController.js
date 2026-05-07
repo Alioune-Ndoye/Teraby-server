@@ -5,7 +5,9 @@ import { success } from '../utils/responseHelper.js'
 import { broadcast } from '../server.js'
 import Booking from '../models/Booking.js'
 
-const ADMIN_NUMBER = (process.env.BUSINESS_WHATSAPP_NUMBER || '').replace('whatsapp:', '')
+const normalizeNumber = (value = '') => value.replace('whatsapp:', '').replace(/\s/g, '')
+
+const ADMIN_NUMBER = normalizeNumber(process.env.BUSINESS_WHATSAPP_NUMBER)
 
 // ─── POST /api/whatsapp/send ──────────────────────────────────────────────────
 export const sendMessage = async (req, res) => {
@@ -19,17 +21,27 @@ export const sendMessage = async (req, res) => {
 
 // ─── POST /api/whatsapp/webhook (Twilio webhook) ──────────────────────────────
 export const webhook = async (req, res) => {
-  const { from, message } = parseWebhook(req.body)
-  const msg = message.trim()
+  const parsed = parseWebhook(req.body)
+  const from = normalizeNumber(parsed.from)
+  const msg = (parsed.message || '').trim()
 
-  console.log('Incoming WhatsApp:', msg, 'from:', from)
+  console.log('RAW FROM:', req.body.From)
+  console.log('NORMALIZED FROM:', from)
+  console.log('ADMIN:', ADMIN_NUMBER)
+
   broadcast('whatsapp_message', { from, message: msg })
 
-  const isAdmin = ADMIN_NUMBER && from === ADMIN_NUMBER
+  const isAdmin = Boolean(ADMIN_NUMBER && from === ADMIN_NUMBER)
+  console.log('[webhook] isAdmin=%s msg=%s', isAdmin, msg)
 
-  if (isAdmin && (msg === '1' || msg === '2')) {
-    await handleAdminReply(from, msg)
-  } else {
+  // Admin replies: "1 <bookingId>" to accept, "2 <bookingId>" to decline
+  // Bare "1" or "2" still works as fallback (picks most recent pending)
+  const parts = msg.split(/\s+/)
+  const digit = parts[0]
+
+  if (isAdmin && (digit === '1' || digit === '2')) {
+    await handleAdminReply(from, digit, parts[1] || null)
+  } else if (!isAdmin) {
     try {
       const reply = await chat([], msg)
       await sendWhatsApp(from, reply)
@@ -43,20 +55,33 @@ export const webhook = async (req, res) => {
 }
 
 // ─── Handle admin "1" / "2" reply ────────────────────────────────────────────
-async function handleAdminReply(adminFrom, msg) {
-  const action = msg === '1' ? 'accepted' : 'declined'
+async function handleAdminReply(adminFrom, digit, bookingId) {
+  const action = digit === '1' ? 'accepted' : 'declined'
 
-  const booking = await Booking.findOne({ status: 'pending' }).sort({ createdAt: -1 })
-  if (!booking) {
-    await sendWhatsApp(adminFrom, 'Aucune réservation en attente.').catch(() => {})
-    return
+  let booking = null
+
+  if (bookingId && /^[a-f0-9]{24}$/i.test(bookingId)) {
+    booking = await Booking.findOne({ _id: bookingId, status: 'pending' })
+    if (!booking) {
+      console.log('[webhook] booking %s not found or not pending', bookingId)
+      await sendWhatsApp(adminFrom, `Réservation introuvable ou déjà traitée.`).catch(() => {})
+      return
+    }
+  } else {
+    booking = await Booking.findOne({ status: 'pending' }).sort({ createdAt: -1 })
+    if (!booking) {
+      console.log('[webhook] no pending booking found')
+      await sendWhatsApp(adminFrom, 'Aucune réservation en attente.').catch(() => {})
+      return
+    }
   }
 
+  console.log('[webhook] updating booking %s to %s', booking._id, action)
   booking.status = action
-  booking.statusHistory.push({ status: action, changedAt: new Date() })
   await booking.save()
+  console.log('[webhook] booking saved, broadcasting')
 
-  broadcast('booking_updated', { id: booking._id, status: action, source: 'whatsapp' })
+  broadcast('booking_updated', { id: booking._id.toString(), status: action, source: 'whatsapp' })
 
   notifyStatusUpdate(booking).catch((e) =>
     console.warn('Client WhatsApp notification failed:', e.message)

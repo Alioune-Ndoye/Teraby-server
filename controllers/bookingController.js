@@ -100,7 +100,7 @@ export const updateStatus = async (req, res) => {
       .catch((e) => console.warn('Confirmation email failed:', e.message))
   }
 
-  broadcast('booking_updated', { id: booking._id, status })
+  broadcast('booking_updated', { id: booking._id.toString(), status })
 
   return success(res, booking, 'Statut mis à jour')
 }
@@ -151,7 +151,7 @@ export const confirmAction = async (req, res) => {
       .catch((e) => console.warn('Confirmation email failed:', e.message))
   }
 
-  broadcast('booking_updated', { id: booking._id, status: action })
+  broadcast('booking_updated', { id: booking._id.toString(), status: action })
 
   return success(res, { status: action }, `Réservation ${action === 'accepted' ? 'acceptée' : 'refusée'}`)
 }
