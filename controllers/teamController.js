@@ -2,14 +2,18 @@ import TeamMember from '../models/TeamMember.js'
 import { cloudinary } from '../config/cloudinary.js'
 import { success, created } from '../utils/responseHelper.js'
 
+function parseSpecialties(value) {
+  if (!value) return []
+  if (Array.isArray(value)) return value.map(String).filter(Boolean)
+  try { return JSON.parse(value) } catch { return [] }
+}
+
 // ─── POST /api/team ───────────────────────────────────────────────────────────
 export const createMember = async (req, res) => {
   const photo = req.file
   const member = await TeamMember.create({
     ...req.body,
-    specialties: req.body.specialties
-      ? JSON.parse(req.body.specialties)
-      : [],
+    specialties: parseSpecialties(req.body.specialties),
     ...(photo && {
       photo: { url: photo.path, publicId: photo.filename },
     }),
@@ -37,7 +41,7 @@ export const updateMember = async (req, res) => {
   const photo = req.file
   const update = {
     ...req.body,
-    ...(req.body.specialties && { specialties: JSON.parse(req.body.specialties) }),
+    ...(req.body.specialties !== undefined && { specialties: parseSpecialties(req.body.specialties) }),
     ...(photo && { photo: { url: photo.path, publicId: photo.filename } }),
   }
 
