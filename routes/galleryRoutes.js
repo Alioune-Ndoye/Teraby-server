@@ -7,8 +7,9 @@ import {
 
 const router = Router()
 
-// Accept two image fields: beforeImage + afterImage
+// Accept: single image (resultats-premium / equipes-action) OR before+after (avant-apres)
 const uploadFields = galleryUpload.fields([
+  { name: 'image',       maxCount: 1 },
   { name: 'beforeImage', maxCount: 1 },
   { name: 'afterImage',  maxCount: 1 },
 ])

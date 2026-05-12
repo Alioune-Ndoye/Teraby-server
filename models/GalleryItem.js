@@ -2,6 +2,11 @@ import mongoose from 'mongoose'
 
 const { Schema } = mongoose
 
+const imageSubSchema = new Schema(
+  { url: { type: String }, publicId: { type: String } },
+  { _id: false }
+)
+
 const galleryItemSchema = new Schema(
   {
     title: {
@@ -15,20 +20,21 @@ const galleryItemSchema = new Schema(
       trim: true,
       maxlength: [400, 'Description cannot exceed 400 characters'],
     },
+    // Gallery section category
+    category: {
+      type: String,
+      enum: ['avant-apres', 'resultats-premium', 'equipes-action'],
+      default: 'avant-apres',
+    },
     serviceType: {
       type: String,
       enum: ['residential', 'deep', 'move', 'commercial'],
     },
-    // Before image
-    beforeImage: {
-      url:       { type: String, required: [true, 'Before image URL is required'] },
-      publicId:  { type: String, required: [true, 'Before image public ID is required'] },
-    },
-    // After image
-    afterImage: {
-      url:       { type: String, required: [true, 'After image URL is required'] },
-      publicId:  { type: String, required: [true, 'After image public ID is required'] },
-    },
+    // Single image — used for resultats-premium and equipes-action
+    image: imageSubSchema,
+    // Before/After pair — used for avant-apres
+    beforeImage: imageSubSchema,
+    afterImage:  imageSubSchema,
     featured: {
       type: Boolean,
       default: false,
@@ -46,9 +52,8 @@ const galleryItemSchema = new Schema(
   }
 )
 
-// ─── Indexes ──────────────────────────────────────────────────────────────────
 galleryItemSchema.index({ featured: 1, order: 1 })
-galleryItemSchema.index({ serviceType: 1 })
+galleryItemSchema.index({ category: 1, createdAt: -1 })
 galleryItemSchema.index({ createdAt: -1 })
 
 const GalleryItem = mongoose.model('GalleryItem', galleryItemSchema)
