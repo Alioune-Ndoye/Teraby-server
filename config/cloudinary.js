@@ -37,6 +37,13 @@ const teamStorage = makeCloudinaryStorage({
   transformation: [{ width: 600, height: 750, crop: 'fill', gravity: 'face', quality: 'auto' }],
 })
 
+// ─── Service background image storage ────────────────────────────────────────
+const serviceBackgroundStorage = makeCloudinaryStorage({
+  folder: 'teraby/service-backgrounds',
+  allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+  transformation: [{ width: 1600, crop: 'limit', quality: 'auto:good' }],
+})
+
 const fileFilter = (_req, file, cb) => {
   if (file.mimetype.startsWith('image/')) {
     cb(null, true)
@@ -55,6 +62,12 @@ export const galleryUpload = multer({
 
 export const teamUpload = multer({
   storage: teamStorage,
+  fileFilter,
+  limits: { fileSize: MAX_FILE_SIZE },
+})
+
+export const serviceBackgroundUpload = multer({
+  storage: serviceBackgroundStorage,
   fileFilter,
   limits: { fileSize: MAX_FILE_SIZE },
 })

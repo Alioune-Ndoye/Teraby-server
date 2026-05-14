@@ -26,6 +26,10 @@ const teamMemberSchema = new Schema(
       publicId: { type: String },
     },
     specialties: [{ type: String, trim: true }],
+    linkedin: {
+      type: String,
+      trim: true,
+    },
     yearsExperience: {
       type: Number,
       min: [0, 'Years of experience cannot be negative'],

@@ -18,8 +18,9 @@ import scheduleRoutes  from './routes/scheduleRoutes.js'
 import whatsappRoutes  from './routes/whatsappRoutes.js'
 import aiRoutes        from './routes/aiRoutes.js'
 import agentRoutes     from './routes/agentRoutes.js'
-import galleryRoutes   from './routes/galleryRoutes.js'
-import teamRoutes      from './routes/teamRoutes.js'
+import galleryRoutes            from './routes/galleryRoutes.js'
+import teamRoutes               from './routes/teamRoutes.js'
+import serviceBackgroundRoutes  from './routes/serviceBackgroundRoutes.js'
 
 // ─── App ──────────────────────────────────────────────────────────────────────
 const app = express()
@@ -105,8 +106,9 @@ app.use('/api/schedule',   scheduleRoutes)
 app.use('/api/whatsapp',   whatsappRoutes)
 app.use('/api/ai',         aiRoutes)
 app.use('/api/agents',     agentRoutes)
-app.use('/api/gallery',    galleryRoutes)
-app.use('/api/team',       teamRoutes)
+app.use('/api/gallery',              galleryRoutes)
+app.use('/api/team',                 teamRoutes)
+app.use('/api/service-backgrounds',  serviceBackgroundRoutes)
 
 // ─── Mobile confirm page — opened from WhatsApp link ─────────────────────────
 // Must be outside /api/* to avoid rate limiting and work as a plain page URL
