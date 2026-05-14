@@ -19,7 +19,7 @@ const teamMemberSchema = new Schema(
     bio: {
       type: String,
       trim: true,
-      maxlength: [600, 'Bio cannot exceed 600 characters'],
+      maxlength: [3000, 'Bio cannot exceed 3000 characters'],
     },
     photo: {
       url:      { type: String },
