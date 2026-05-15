@@ -3,7 +3,7 @@ import { CHAT_SYSTEM_PROMPT } from '../utils/promptTemplates.js'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
-const MODEL   = 'claude-opus-4-6'
+const MODEL   = 'claude-sonnet-4-6'
 const MAX_TOKENS = 1024
 
 // ─── Single chat turn (with history) ─────────────────────────────────────────
