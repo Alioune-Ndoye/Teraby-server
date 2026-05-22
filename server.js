@@ -54,6 +54,8 @@ const ALLOWED_ORIGINS = [
   'http://localhost:4173',   // vite preview
   'https://teraby-client.vercel.app',
   'https://teraby-admin.vercel.app',
+  'https://teraby.fr',
+  'https://www.teraby.fr',
 ]
 
 app.use(cors({
