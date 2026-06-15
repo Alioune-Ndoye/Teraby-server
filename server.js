@@ -21,6 +21,7 @@ import agentRoutes     from './routes/agentRoutes.js'
 import galleryRoutes            from './routes/galleryRoutes.js'
 import teamRoutes               from './routes/teamRoutes.js'
 import serviceBackgroundRoutes  from './routes/serviceBackgroundRoutes.js'
+import newsletterRoutes         from './routes/newsletterRoutes.js'
 
 // ─── App ──────────────────────────────────────────────────────────────────────
 const app = express()
@@ -111,6 +112,7 @@ app.use('/api/agents',     agentRoutes)
 app.use('/api/gallery',              galleryRoutes)
 app.use('/api/team',                 teamRoutes)
 app.use('/api/service-backgrounds',  serviceBackgroundRoutes)
+app.use('/api/newsletter',           newsletterRoutes)
 
 // ─── Mobile confirm page — opened from WhatsApp link ─────────────────────────
 // Must be outside /api/* to avoid rate limiting and work as a plain page URL
